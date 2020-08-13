@@ -2,7 +2,7 @@
 
 const restify = require("restify");
 
-const {getGtfsEdges} = require('./src/daos/GtfsEdgesDao')
+const {getGtfsEdges} = require('./src/daos/GtfsNetworkDao')
 
 const PORT = process.env.PORT || 8080
 
