@@ -23,6 +23,7 @@
     "react-scripts": "^3.4.3",
     "react-tooltip": "^4.2.8",
     "restify": "^8.5.1",
+    "restify-cors-middleware": "^1.1.1",
     "styled-components": "^5.1.1"
   },
   "scripts": {
