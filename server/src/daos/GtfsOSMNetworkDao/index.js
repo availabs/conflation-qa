@@ -14,9 +14,8 @@
   +-----+------------------+---------+---------+------------+----+
 */
 
-const _ = require('lodash')
-
-const db = require('../../services/DatabaseService')
+const _ = require('lodash');
+const db = require('../../services/DatabaseService');
 
 const getGtfsShapeMatchesStmt = db.prepare(`
   SELECT
@@ -35,30 +34,36 @@ const getGtfsShapeMatchesStmt = db.prepare(`
       ']' AS value
     FROM gtfs_osm_network.gtfs_shape_shst_match_paths
     GROUP BY gtfs_shape_id, gtfs_shape_index ;
-`)
+`);
 
 const getGtfsMatches = () => {
-  const result = getGtfsShapeMatchesStmt
-    .raw()
-    .all()
+  const result = getGtfsShapeMatchesStmt.raw().all();
 
   const matches = result.reduce((acc, [k, v]) => {
-    acc[k] = _(JSON.parse(v)).sortBy([0, 1])
+    acc[k] = _(JSON.parse(v))
       .filter(([, , shst_match_id]) => shst_match_id !== null)
+      .sortBy([0, 1])
       .map(
-        ([, , shst_match_id, shst_reference, shst_ref_start, shst_ref_end]) => ({
+        ([
+          ,
+          ,
           shst_match_id,
           shst_reference,
           shst_ref_start,
-          shst_ref_end
-        })
+          shst_ref_end,
+        ]) => ({
+          shst_match_id,
+          shst_reference,
+          shst_ref_start,
+          shst_ref_end,
+        }),
       )
-      .value()
+      .value();
 
-    return acc
-  }, {})
+    return acc;
+  }, {});
 
-  return matches
-}
+  return matches;
+};
 
-module.exports = {getGtfsMatches}
+module.exports = { getGtfsMatches };
