@@ -16,7 +16,7 @@ const conflation = new MapLayer("Conflation QA", {
     onHover: {
         layers: ['shst'],
         dataFunc: (feature) => {
-            console.log('HOVER', feature, feature[0].properties.shstid)
+            // console.log('HOVER', feature, feature[0].properties.shstid)
             // conflation.map.setPaintProperty("shst", "line-color",
             // ["case",
             //     ["==", ["string", ["get", "shstid"]], feature[0].properties.shstid],
