@@ -41,6 +41,13 @@ const conflation = new ShstLayer("Conflation QA", {
             )
         }
     },*/
+    onClick: {
+        layers: ['shst', "gtfs-edges"],
+        dataFunc: (feature) => {
+            console.log('Click', feature, feature[0].properties.shstid)
+           
+        }
+    },
     popover: {
         layers: ["shst","gtfs-edges"],
         dataFunc: (feature,map) => Object.keys(feature.properties).map(k => [k, feature.properties[k]])
