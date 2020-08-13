@@ -7,8 +7,8 @@ export const ShstSource = {
 }
 
 const n = "networklevel",
-  w = 1,
-  o = 1,
+  w = 10,
+  o = 10,
   c = 'rgba(255, 255, 255, 0.95)'
 
 export const npmrdsPaint = (NETWORK_LEVEL, WIDTH_MULT,OFFSET_MULT, COLOR) => ({
@@ -135,7 +135,12 @@ export const npmrdsPaint = (NETWORK_LEVEL, WIDTH_MULT,OFFSET_MULT, COLOR) => ({
     1
   ],
 
-  'line-color': COLOR,
+  'line-color':  [
+    "case",
+    ["boolean", ["feature-state", "hover"], false],
+    'chartreuse',
+    COLOR
+  ],
 
   'line-offset': [
   "interpolate",
@@ -240,8 +245,8 @@ export const ShshStyle =  {
   beneath: 'road-label',
   layout: {
     'visibility': 'visible',
-    'line-join': 'round',
-    'line-cap': 'round'
+    'line-join': 'bevel',
+    'line-cap': 'square'
   },
   paint: npmrdsPaint(n,w,o,c)
 };
@@ -257,5 +262,6 @@ export const ShshStyleOutline =  {
     'line-join': 'round',
     'line-cap': 'round'
   },
-  paint: npmrdsPaint(n,w * 1.1,o,'rgba(30, 30, 30, 0.95)')
+  paint: npmrdsPaint(n,w * 1.1,o,'rgba(0, 0, 0, 0.95)')
 };
+

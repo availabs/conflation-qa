@@ -10,7 +10,7 @@ function App() {
       <AvlMap
         layers={[qaLayer]}
         dragPan={true}
-        style={ 'mapbox://styles/am3081/ckdrpq3w2079419ppmytrrafm' }
+        style={ 'mapbox://styles/am3081/ckdsuik5w1b2x19n5d9lkow78' }
         sidebar={false}
         header="Transit Data"/>
     </div>
