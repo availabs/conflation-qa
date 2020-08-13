@@ -265,3 +265,29 @@ export const ShshStyleOutline =  {
   paint: npmrdsPaint(n,w * 1.1,o,'rgba(0, 0, 0, 0.95)')
 };
 
+export const GtfsEdgesStyle = {
+    'id': 'gtfs-edges',
+    'type': 'line',
+    'source': 'gtfs-edges',
+    'layout': {},
+    'paint': {
+		'line-color':  [
+		    "case",
+		    ["boolean", ["feature-state", "hover"], false],
+		    '#FF8C00',
+		    'slateblue'
+		],
+        'line-opacity': 0.8,
+        'line-width': [
+          "interpolate",
+          ["exponential", 1.7],
+          ["zoom"],
+          5,
+            1,
+          18,
+            30
+        ]
+
+    }
+}
+

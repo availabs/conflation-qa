@@ -1,37 +1,53 @@
 import React from "react"
-import { ShshStyle, ShshStyleOutline, ShstSource } from './shst_styles.js'
+import { ShshStyle, ShstSource, GtfsEdgesStyle } from './shst_styles.js'
 import MapLayer from "AvlMap/MapLayer"
 
-const COLOR = 'rgba(255, 255, 255, 0.95)'
+// const COLOR = 'rgba(255, 255, 255, 0.95)'
+const api = 'http://localhost:8080'
+
+class ShstLayer extends MapLayer {
+    onAdd(map) {
+        super.onAdd(map);
+    }
+}
 
 
-const conflation = new MapLayer("Conflation QA", {
+const conflation = new ShstLayer("Conflation QA", {
     active: true,
     sources: [
-        ShstSource
+        ShstSource,
+        {   
+            id: 'gtfs-edges',
+            source: {
+                'type': 'geojson',
+                'data': `${api}/gtfs-edges`,
+                'generateId': true
+            }
+        }
     ],
     layers: [
-        ShshStyle
+        ShshStyle,
+        GtfsEdgesStyle
     ],
-    onHover: {
-        layers: ['shst'],
+   /* onHover: {
+        layers: ['shst', "gtfs-edges"],
         dataFunc: (feature) => {
-            // console.log('HOVER', feature, feature[0].properties.shstid)
-            // conflation.map.setPaintProperty("shst", "line-color",
-            // ["case",
-            //     ["==", ["string", ["get", "shstid"]], feature[0].properties.shstid],
-            //     'chartreuse',
-            //     COLOR]
-            // )
+            console.log('HOVER', feature, feature[0].properties.shstid)
+            conflation.map.setPaintProperty("shst", "line-color",
+            ["case",
+                ["==", ["string", ["get", "shstid"]], feature[0].properties.shstid],
+                'chartreuse',
+                COLOR]
+            )
         }
-    },
+    },*/
     popover: {
-        layers: ["shst"],
+        layers: ["shst","gtfs-edges"],
         dataFunc: (feature,map) => Object.keys(feature.properties).map(k => [k, feature.properties[k]])
     },
     
     infoBoxes: {
-        test: {
+        Overview: {
             comp: () => <div style={{backgroundColor: '#fff'}}>Conflation QA</div> ,
             show: true
         }
