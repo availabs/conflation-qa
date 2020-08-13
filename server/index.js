@@ -4,6 +4,7 @@ const restify = require("restify");
 const corsMiddleware = require('restify-cors-middleware')
 
 const {getGtfsEdges} = require('./src/daos/GtfsNetworkDao')
+const {getGtfsMatches} = require('./src/daos/GtfsOSMNetworkDao')
 
 const PORT = process.env.PORT || 8080
 
@@ -20,6 +21,12 @@ server.use(cors.actual)
 server.get("/gtfs-edges", (_req, res, next) => {
   const gtfsEdges = getGtfsEdges()
   res.send(gtfsEdges);
+  next();
+});
+
+server.get("/gtfs-matches", (_req, res, next) => {
+  const gtfsMatches = getGtfsMatches()
+  res.send(gtfsMatches);
   next();
 });
 
