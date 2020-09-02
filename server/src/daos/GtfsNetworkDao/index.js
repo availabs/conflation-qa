@@ -12,7 +12,11 @@ const getGtfsEdges = () => {
   const features = getGtfsEdgesStmt
     .raw()
     .all()
-    .map(([feature]) => JSON.parse(feature));
+    .map(([feature]) => {
+    	let f = JSON.parse(feature)
+    	f.properties.matchId = `${f.properties.shape_id}::${f.properties.shape_index}`
+    	return f
+    });
 
   return turf.featureCollection(features);
 };

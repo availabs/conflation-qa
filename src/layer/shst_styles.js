@@ -9,7 +9,7 @@ export const ShstSource = {
 const n = "networklevel",
   w = 10,
   o = 10,
-  c = 'rgba(255, 255, 255, 0.95)'
+  c = 'white'
 
 export const npmrdsPaint = (NETWORK_LEVEL, WIDTH_MULT,OFFSET_MULT, COLOR) => ({
   'line-width': [
