@@ -16,10 +16,16 @@ class ShstLayer extends MapLayer {
         })
 
     }
+    toggleTransit() {
+        var visibility = this.map.getLayoutProperty('gtfs-edges', 'visibility') === 'visible' ? 'none' : 'visible';
+        this.map.setLayoutProperty('gtfs-edges', 'visibility', visibility);
+
+    }
 }
 
 
-const conflation = new ShstLayer("Conflation QA", {
+ export default (props = {}) =>
+    new ShstLayer("Conflation QA", {
     active: true,
     matches: {},
     sources: [
@@ -39,10 +45,11 @@ const conflation = new ShstLayer("Conflation QA", {
     ],
     onHover: {
         layers: ['shst', "gtfs-edges"],
-        dataFunc: (feature, layer, map, a, b) => {
-            console.log('HOVER', feature, layer, map, a, b)
+        dataFunc: function (feature, layer, map, a, b) {
+            console.log('HOVER', this.matches)
+
             if(feature[0].properties.shape_id){
-                console.log('shape_id', feature[0].properties.shape_id, this)
+                //console.log('shape_id', feature[0].properties.shape_id, this)
             }
             // conflation.map.setPaintProperty("shst", "line-color",
             // ["case",
@@ -54,7 +61,7 @@ const conflation = new ShstLayer("Conflation QA", {
     },
     onClick: {
         layers: ['shst', "gtfs-edges"],
-        dataFunc: (feature) => {
+        dataFunc: function (feature) {
             console.log('Click', feature, feature[0].properties.shstid)
            
         }
@@ -66,7 +73,9 @@ const conflation = new ShstLayer("Conflation QA", {
     
     infoBoxes: {
         Overview: {
-            comp: () => <div style={{backgroundColor: '#fff'}}>Conflation QA</div> ,
+            comp: function (layer) {
+                return <MapController layer={layer}/> 
+            },
             show: true
         }
 
@@ -74,4 +83,19 @@ const conflation = new ShstLayer("Conflation QA", {
     
 })
 
-export default conflation
+const MapController = ({layer}) => {
+    console.log('MapController', layer, layer.toggleTransit)
+
+
+    return  (
+
+        <div style={{backgroundColor: '#fff',padding: 15}}>
+            <div>
+                <h4>Transit Layer<span><input type='checkbox'  /></span></h4>
+            </div>
+
+        </div>
+    )
+}
+
+

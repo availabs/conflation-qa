@@ -2,9 +2,10 @@ import React from "react";
 
 import AvlMap from "./AvlMap"
 // import TransitLayerFactory from './layers/TransitLayer'
-import qaLayer from 'layer/qa.layer'
+import qaLayerFactory from 'layer/qa.layer'
 
 function App() {
+  const qaLayer = qaLayerFactory({active: true});
   return (
     <div style={{ height: "100vh" }}>
       <AvlMap
