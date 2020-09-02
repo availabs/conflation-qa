@@ -47,7 +47,7 @@ class ShstLayer extends MapLayer {
     new ShstLayer("Conflation QA", {
     active: true,
     matches: {},
-    shstHover: [],
+    segments: [],
     sources: [
         ShstSource,
         {   
@@ -106,7 +106,9 @@ class ShstLayer extends MapLayer {
                         'slateblue'
                     ]
                 )
+               
                 if(segments) {
+                    this.segments = segments || []
                     let shstIds = Object.values(segments).map(v => v.shst_reference)
                     this.map.setPaintProperty(
                         "shst", 
@@ -149,7 +151,7 @@ const MapController = ({layer}) => {
     //     console.log('transitVisibility', e.target.value/100, layer)
     //     (e.target.value/100)
     // } 
-
+    console.log('segments', layer.segments)
     return  (
 
         <div style={{backgroundColor: '#fff',padding: 15}}>
@@ -161,7 +163,13 @@ const MapController = ({layer}) => {
                 <label style={{color: colors.light}}>Opacity</label>
                 <input type="range" min="1" max="100" onChange={layer.transitOpacity} style={{width: '100%'}}/>
                 <div>
-                {layer.matchId}
+                    {layer.matchId}
+                    <table>
+                        <tbody>
+                            {layer.segments.map(d => <tr><td>{d.shst_match_id}</td><td>{d.shst_reference}</td></tr>)}
+                        </tbody>    
+                    </table>
+                    
                 </div>
             </div>
         </div>
