@@ -14,14 +14,27 @@ class ShstLayer extends MapLayer {
         .then(matches => {
             console.log('matches', matches)
             this.matches = matches
-            this.calculateStatistics(map,matches)
+            fetch(`${api}/gtfs-edges`)
+                .then(r => r.json())
+                .then(edges => {
+                    this.edges = edges
+                    this.calculateStatistics(map,matches, edges)
+                })
+            
         })
         
         this.toggleTransit = this.toggleTransit.bind(this)
         this.transitOpacity = this.transitOpacity.bind(this)
     }
 
-    calculateStatistics (map,matches) {
+    calculateStatistics (map,matches,edges) {
+        console.log('calculateStatistics', matches, edges)
+        let matched = 0
+        edges.features.forEach(e => {
+            matched += matches[e.properties.matchId] ? 1 : 0
+        })
+        this.numEdges = edges.features.length
+        this.numMatches = matched
 
     }
 
@@ -161,7 +174,26 @@ const MapController = ({layer}) => {
                     <span style={{float: 'right'}}><input type='checkbox'  onClick={layer.toggleTransit}/></span>
                 </div>
                 <label style={{color: colors.light}}>Opacity</label>
-                <input type="range" min="1" max="100" onChange={layer.transitOpacity} style={{width: '100%'}}/>
+                <input type="range" min="1" max="100" onChange={layer.transitOpacity} style={{width: '100%'}}/>\
+                <div style={{display: 'flex', padding: 10, borderRadius: 5, border: '1px solid DimGray'}}>
+                    {layer.numMatches ? 
+                        (
+                        <>
+                        <div style={{flex: '1',textAlign:'center'}}>
+                            <div># Edges</div>
+                            <div style={{fontSize:'3em', fontWeight: 500, padding: 5}}>{layer.numEdges.toLocaleString()}</div>
+                        </div>
+                        <div style={{flex: '1',textAlign:'center'}}>
+                            <div>% Matching</div>
+                            <div style={{fontSize:'3em', fontWeight: 500, padding: 5}}>{ ((layer.numMatches / layer.numEdges) *100).toFixed(1)}</div>
+                            
+                        </div>
+                        <div style={{flex: '1',textAlign:'center'}}>
+                            
+                        </div></>)
+                        : <div style={{flex: '1',textAlign:'center'}}>...</div>
+                    }
+                </div>
                 <div>
                     {layer.matchId}
                     <table>
