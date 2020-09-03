@@ -5,6 +5,13 @@ const corsMiddleware = require('restify-cors-middleware');
 
 const { getGtfsEdges } = require('./src/daos/GtfsNetworkDao');
 const { getGtfsMatches } = require('./src/daos/GtfsOSMNetworkDao');
+const {
+  getGtfsConflationMapJoin,
+} = require('./src/daos/GtfsConflationMapJoinDao');
+
+const {
+  getGtfsConflationScheduleJoin,
+} = require('./src/daos/GtfsConflationScheduleJoinDao');
 
 const PORT = process.env.PORT || 8080;
 
@@ -27,6 +34,18 @@ server.get('/gtfs-edges', (_req, res, next) => {
 server.get('/gtfs-matches', (_req, res, next) => {
   const gtfsMatches = getGtfsMatches();
   res.send(gtfsMatches);
+  next();
+});
+
+server.get('/gtfs-conflation-map-join', (_req, res, next) => {
+  const result = getGtfsConflationMapJoin();
+  res.send(result);
+  next();
+});
+
+server.get('/gtfs-conflation-schedule-join', (_req, res, next) => {
+  const result = getGtfsConflationScheduleJoin();
+  res.send(result);
   next();
 });
 
