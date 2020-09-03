@@ -13,9 +13,9 @@ const getGtfsEdges = () => {
     .raw()
     .all()
     .map(([feature]) => {
-    	let f = JSON.parse(feature)
-    	f.properties.matchId = `${f.properties.shape_id}::${f.properties.shape_index}`
-    	return f
+      let f = JSON.parse(feature);
+      f.properties.matchId = `${f.properties.shape_id}::${f.properties.shape_index}`;
+      return f;
     });
 
   return turf.featureCollection(features);

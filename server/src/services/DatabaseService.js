@@ -17,11 +17,16 @@ const dataDir = isAbsolute(DATABASE_DIR_PATH)
 
 const db = new Database();
 
-['raw_gtfs', 'geojson_gtfs', 'gtfs_network', 'gtfs_osm_network'].forEach(
-  (database) => {
-    const dbPath = join(dataDir, database);
-    db.exec(`ATTACH DATABASE '${dbPath}' AS ${database};`);
-  },
-);
+[
+  'raw_gtfs',
+  'geojson_gtfs',
+  'gtfs_network',
+  'gtfs_osm_network',
+  'gtfs_conflation_map_join',
+  'gtfs_conflation_schedule_join',
+].forEach((database) => {
+  const dbPath = join(dataDir, database);
+  db.exec(`ATTACH DATABASE '${dbPath}' AS ${database};`);
+});
 
 module.exports = db;
