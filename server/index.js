@@ -43,11 +43,15 @@ server.get('/gtfs-conflation-map-join', (_req, res, next) => {
   next();
 });
 
-server.get('/gtfs-conflation-schedule-join', (_req, res, next) => {
-  const result = getGtfsConflationScheduleJoin();
-  res.send(result);
-  next();
-});
+server.get(
+  '/gtfs-conflation-schedule-join/:conflation_map_id',
+  (req, res, next) => {
+    const { conflation_map_id } = req.params;
+    const result = getGtfsConflationScheduleJoin(conflation_map_id);
+    res.send(result);
+    next();
+  },
+);
 
 server.listen(PORT, function main() {
   console.log('%s listening at %s', server.name, server.url);

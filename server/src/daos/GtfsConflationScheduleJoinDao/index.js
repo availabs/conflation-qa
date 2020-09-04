@@ -19,11 +19,14 @@ const getGtfsConflationScheduleJoinStmt = db.prepare(`
       aadt_by_peak,
       aadt_by_route
     FROM gtfs_conflation_schedule_join.conflation_map_aadt_breakdown
+    WHERE ( conflation_map_id = ? )
   ;
 `);
 
-const getGtfsConflationScheduleJoin = () => {
-  const result = getGtfsConflationScheduleJoinStmt.raw().all();
+const getGtfsConflationScheduleJoin = (conflation_map_id) => {
+  const result = getGtfsConflationScheduleJoinStmt
+    .raw()
+    .all([conflation_map_id]);
 
   const d = result.reduce((acc, row) => {
     const [conflation_map_id, aadt, aadt_by_peak, aadt_by_route] = row;
