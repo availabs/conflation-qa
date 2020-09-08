@@ -19,17 +19,15 @@ const db = require('../../services/DatabaseService');
 
 const getGtfsConflationMapJoinStmt = db.prepare(`
   SELECT
-      a.gtfs_shape_id,
-      a.gtfs_shape_index,
-      a.conflation_map_id,
-      b.conf_map_seg_len,
-      a.conf_map_pre_len,
-      a.conf_map_post_len,
-      a.along_idx,
-      b.intersection_len
-    FROM gtfs_conflation_map_join.gtfs_matches_conflation_map_join AS a
-      INNER JOIN gtfs_conflation_map_join.map_segments_cospatiality AS b
-        USING (conflation_map_id)
+      gtfs_shape_id,
+      gtfs_shape_index,
+      conflation_map_id,
+      conf_map_seg_len,
+      conf_map_pre_len,
+      conf_map_post_len,
+      along_idx,
+      intersection_len
+    FROM gtfs_conflation_map_join.gtfs_matches_conflation_map_join
   ;
 `);
 
