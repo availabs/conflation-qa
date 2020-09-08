@@ -6,6 +6,7 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "@turf/length": "^6.0.2",
     "@turf/turf": "^5.1.6",
     "better-sqlite3": "^7.1.0",
     "classnames": "^2.2.6",

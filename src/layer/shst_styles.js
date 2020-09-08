@@ -2,11 +2,12 @@ export const ShstSource = {
     id: 'ShstSource',
     source: {
         type: 'vector',
+        //url: 'mapbox://am3081.4oitms17'
         url: 'mapbox://am3081.bmj798ao'
     }
 }
 
-const n = "networklevel",
+const n = "netlev",
   w = 10,
   o = 10,
   c = 'white'
@@ -251,19 +252,19 @@ export const ShshStyle =  {
   paint: npmrdsPaint(n,w,o,c)
 };
 
-export const ShshStyleOutline =  {
-  "id": "shst",
-  "type": "line",
-  "source": "ShstSource",
-  "source-layer": "gtfs_conflation_qa",
-  beneath: 'road-label',
-  layout: {
-    'visibility': 'visible',
-    'line-join': 'round',
-    'line-cap': 'round'
-  },
-  paint: npmrdsPaint(n,w * 1.1,o,'rgba(0, 0, 0, 0.95)')
-};
+// export const ShshStyleOutline =  {
+//   "id": "shst",
+//   "type": "line",
+//   "source": "ShstSource",
+//   "source-layer": "gtfs_conflation_qa",
+//   beneath: 'road-label',
+//   layout: {
+//     'visibility': 'visible',
+//     'line-join': 'round',
+//     'line-cap': 'round'
+//   },
+//   paint: npmrdsPaint(n,w * 1.1,o,'rgba(0, 0, 0, 0.95)')
+// };
 
 export const GtfsEdgesStyle = {
     'id': 'gtfs-edges',
