@@ -10,6 +10,11 @@ const {
 } = require('./src/daos/GtfsConflationMapJoinDao');
 
 const {
+  getSharedStreetsMatchParameters,
+  runSharedStreetsMatch,
+} = require('./src/controllers/ConflationController');
+
+const {
   getGtfsConflationScheduleJoin,
 } = require('./src/daos/GtfsConflationScheduleJoinDao');
 
@@ -24,6 +29,7 @@ const cors = corsMiddleware({
 
 server.pre(cors.preflight);
 server.use(cors.actual);
+server.use(restify.plugins.bodyParser());
 
 server.get('/gtfs-edges', (_req, res, next) => {
   const gtfsEdges = getGtfsEdges();
@@ -52,6 +58,27 @@ server.get(
     next();
   },
 );
+
+server.get('/shst-match-params-descriptions', (_req, res, next) => {
+  const params = getSharedStreetsMatchParameters();
+  res.send(params);
+  next();
+});
+
+server.post('/shst-match', async (req, res, next) => {
+  try {
+    console.log(JSON.stringify(req.body, null, 4));
+
+    const { features, flags } = req.body;
+
+    const matches = await runSharedStreetsMatch(features, flags);
+
+    res.send(matches);
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 server.listen(PORT, function main() {
   console.log('%s listening at %s', server.name, server.url);

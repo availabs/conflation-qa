@@ -26,7 +26,8 @@
     "react-tooltip": "^4.2.8",
     "restify": "^8.5.1",
     "restify-cors-middleware": "^1.1.1",
-    "styled-components": "^5.1.1"
+    "styled-components": "^5.1.1",
+    "uuid": "^8.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
