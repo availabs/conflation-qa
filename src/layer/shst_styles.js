@@ -3,11 +3,11 @@ export const ShstSource = {
     source: {
         type: 'vector',
         //url: 'mapbox://am3081.4oitms17'
-        url: 'mapbox://am3081.bmj798ao'
+        url: 'mapbox://am3081.anaf5ctw'
     }
 }
 
-const n = "netlev",
+const n = 'nlev', //"netlev",
   w = 10,
   o = 10,
   c = 'white'

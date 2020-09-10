@@ -44,6 +44,10 @@ class ShstLayer extends MapLayer {
         this.unJoined = []
         this.match10 = 0
         this.match50 = 0
+        this.join10 = 0
+        this.join50 = 0
+        this.schedSegments = []
+
         edges.features.forEach((e,i) => {
             
             e.properties.length = length(e)
@@ -67,9 +71,29 @@ class ShstLayer extends MapLayer {
 
             this.numJoins += joins[e.properties.matchId] ? 1 : 0
             if(!joins[e.properties.matchId]) {
+
                 this.unJoined.push(e.properties.matchId)
+            
+            }  else { 
+                
+                joins[e.properties.matchId].forEach(seg => {
+                    if(this.schedSegments.indexOf(seg.conflation_map_id) === -1){
+                        this.schedSegments.push(seg.conflation_map_id)
+                    }
+                })
+
+
+                let matchLength = joins[e.properties.matchId]
+                    .reduce((out, curr) =>  { return out + (curr.conf_map_seg_len - (curr.conf_map_pre_len + curr.conf_map_post_len ))},0)
+                
+                this.join10 +=  Math.abs(e.properties.length - matchLength) < .01 ? 1 : 0
+                this.join50 +=  Math.abs(e.properties.length - matchLength) < .5 ? 1 : 0
+
             }
+
         })
+        console.log('scheduled segments',this.schedSegments.length)
+        
         this.edges = edges
         this.numEdges = edges.features.length
         
@@ -168,10 +192,11 @@ class ShstLayer extends MapLayer {
         layers: ['shst', "gtfs-edges"],
         dataFunc: function (feature) {
             
-            if(feature[0].properties.shape_id){
+            if(feature[0].properties.shape_id && this.joins){
                 let matchId = `${feature[0].properties.shape_id}::${feature[0].properties.shape_index}`
                 this.matchId = matchId
-                let segments = this.matches[matchId]
+                let segments = this.joins[matchId]
+                console.log('click data',segments, this.joins, matchId, this.joins[matchId])
                 this.map.setPaintProperty(
                     "gtfs-edges", 
                     "line-color",
@@ -185,17 +210,26 @@ class ShstLayer extends MapLayer {
                
                 if(segments) {
                     this.segments = segments || []
-                    let shstIds = Object.values(segments).map(v => v.shst_reference)
+                    let shstIds = Object.values(segments).map(v => +v.conflation_map_id)
+                    console.log('conflation ids', shstIds)
                     this.map.setPaintProperty(
                         "shst", 
                         "line-color",
                         ["match", 
-                            ["string", ["get", "shstid"]], 
+                            ["get", "id"], 
                             shstIds,
                             'yellow',
                             'white'
                         ]
                     )
+                    console.log('fetch', `${api}/gtfs-conflation-schedule-join/${segments[0]}`)
+                    fetch(`${api}/gtfs-conflation-schedule-join/${shstIds[0]}`)
+                        .then(r => r.json())
+                        .then(sched => {
+                            console.log('a schedule', sched)
+                        })
+
+
                 }
 
 
@@ -237,7 +271,7 @@ const MapController = ({layer}) => {
                     <span style={{float: 'right'}}><input type='checkbox'  onClick={layer.toggleTransit}/></span>
                 </div>
                 <label style={{color: colors.light}}>Opacity</label>
-                <input type="range" min="1" max="100" onChange={layer.transitOpacity} style={{width: '100%'}}/>\
+                <input type="range" min="1" max="100" onChange={layer.transitOpacity} style={{width: '100%'}}/>
                 <div style={{display: 'flex', padding: 10, borderRadius: 5, border: '1px solid DimGray', flexDirection: 'column'}}>
                     {layer.numMatches ? 
                         (
@@ -270,14 +304,16 @@ const MapController = ({layer}) => {
                             
                             </div>
                             <div style={{flex: '1',textAlign:'center'}}>
-                                
+                                 <div> 5m </div>
+                                <div style={{fontSize:'3em', fontWeight: 500, padding: 5}}>{ ((layer.join10 / layer.numEdges) *100).toFixed(1)}</div>
                             </div>
                             <div style={{flex: '1',textAlign:'center'}}>
-                                
+                                 <div> 50m </div>
+                                <div style={{fontSize:'3em', fontWeight: 500, padding: 5}}>{ ((layer.join50 / layer.numEdges) *100).toFixed(1)}</div>
                             </div>
                         </div>
                         </>)
-                        : <div style={{flex: '1',textAlign:'center'}}>...</div>
+                        : <div style={{flex: '1',textAlign:'center'}}><h4>Loading Conflation</h4></div>
                     }
                 </div>
                 
