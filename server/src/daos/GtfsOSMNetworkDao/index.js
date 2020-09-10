@@ -66,4 +66,29 @@ const getGtfsMatches = () => {
   return matches;
 };
 
-module.exports = { getGtfsMatches };
+const getSharedStreetsMatchesScoresStmt = db.prepare(`
+  SELECT
+      gtfs_shape_id,
+      gtfs_shape_index,
+      scores
+    FROM gtfs_osm_network.gtfs_shape_shst_match_scores
+`);
+
+const getSharedStreetsMatchesScores = () => {
+  const result = getSharedStreetsMatchesScoresStmt.raw().all();
+
+  const scores = result.reduce(
+    (acc, [gtfs_shape_id, gtfs_shape_index, scores]) => {
+      const k = `${gtfs_shape_id}::${gtfs_shape_index}`;
+
+      acc[k] = JSON.parse(scores);
+
+      return acc;
+    },
+    {},
+  );
+
+  return scores;
+};
+
+module.exports = { getGtfsMatches, getSharedStreetsMatchesScores };

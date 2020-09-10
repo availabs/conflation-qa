@@ -4,7 +4,10 @@ const restify = require('restify');
 const corsMiddleware = require('restify-cors-middleware');
 
 const { getGtfsEdges } = require('./src/daos/GtfsNetworkDao');
-const { getGtfsMatches } = require('./src/daos/GtfsOSMNetworkDao');
+const {
+  getGtfsMatches,
+  getSharedStreetsMatchesScores,
+} = require('./src/daos/GtfsOSMNetworkDao');
 const {
   getGtfsConflationMapJoin,
 } = require('./src/daos/GtfsConflationMapJoinDao');
@@ -78,6 +81,12 @@ server.post('/shst-match', async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+server.get('/shst-match-scores', (_req, res, next) => {
+  const scores = getSharedStreetsMatchesScores();
+  res.send(scores);
+  next();
 });
 
 server.listen(PORT, function main() {
