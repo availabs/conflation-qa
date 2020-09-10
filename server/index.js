@@ -4,10 +4,18 @@ const restify = require('restify');
 const corsMiddleware = require('restify-cors-middleware');
 
 const { getGtfsEdges } = require('./src/daos/GtfsNetworkDao');
-const { getGtfsMatches } = require('./src/daos/GtfsOSMNetworkDao');
+const {
+  getGtfsMatches,
+  getSharedStreetsMatchesScores,
+} = require('./src/daos/GtfsOSMNetworkDao');
 const {
   getGtfsConflationMapJoin,
 } = require('./src/daos/GtfsConflationMapJoinDao');
+
+const {
+  getSharedStreetsMatchParameters,
+  runSharedStreetsMatch,
+} = require('./src/controllers/ConflationController');
 
 const {
   getGtfsConflationScheduleJoin,
@@ -24,6 +32,7 @@ const cors = corsMiddleware({
 
 server.pre(cors.preflight);
 server.use(cors.actual);
+server.use(restify.plugins.bodyParser());
 
 server.get('/gtfs-edges', (_req, res, next) => {
   const gtfsEdges = getGtfsEdges();
@@ -43,15 +52,38 @@ server.get('/gtfs-conflation-map-join', (_req, res, next) => {
   next();
 });
 
-server.get(
-  '/gtfs-conflation-schedule-join/:conflation_map_id',
-  (req, res, next) => {
-    const { conflation_map_id } = req.params;
-    const result = getGtfsConflationScheduleJoin(conflation_map_id);
-    res.send(result);
+server.get('/gtfs-conflation-schedule-join', (_req, res, next) => {
+  const result = getGtfsConflationScheduleJoin();
+  res.send(result);
+  next();
+});
+
+server.get('/shst-match-params-descriptions', (_req, res, next) => {
+  const params = getSharedStreetsMatchParameters();
+  res.send(params);
+  next();
+});
+
+server.post('/shst-match', async (req, res, next) => {
+  try {
+    console.log(JSON.stringify(req.body, null, 4));
+
+    const { features, flags } = req.body;
+
+    const matches = await runSharedStreetsMatch(features, flags);
+
+    res.send(matches);
     next();
-  },
-);
+  } catch (err) {
+    next(err);
+  }
+});
+
+server.get('/shst-match-scores', (_req, res, next) => {
+  const scores = getSharedStreetsMatchesScores();
+  res.send(scores);
+  next();
+});
 
 server.listen(PORT, function main() {
   console.log('%s listening at %s', server.name, server.url);

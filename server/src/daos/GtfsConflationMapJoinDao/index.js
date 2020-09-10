@@ -22,9 +22,11 @@ const getGtfsConflationMapJoinStmt = db.prepare(`
       gtfs_shape_id,
       gtfs_shape_index,
       conflation_map_id,
+      conf_map_seg_len,
       conf_map_pre_len,
       conf_map_post_len,
-      along_idx
+      along_idx,
+      intersection_len
     FROM gtfs_conflation_map_join.gtfs_matches_conflation_map_join
   ;
 `);
@@ -37,9 +39,11 @@ const getGtfsConflationMapJoin = () => {
       gtfs_shape_id,
       gtfs_shape_index,
       conflation_map_id,
+      conf_map_seg_len,
       conf_map_pre_len,
       conf_map_post_len,
       along_idx,
+      intersection_len,
     ] = row;
 
     const gtfsId = `${gtfs_shape_id}::${gtfs_shape_index}`;
@@ -47,8 +51,10 @@ const getGtfsConflationMapJoin = () => {
     acc[gtfsId] = acc[gtfsId] || [];
     acc[gtfsId][along_idx] = {
       conflation_map_id,
+      conf_map_seg_len: _.round(conf_map_seg_len, 3),
       conf_map_pre_len: _.round(conf_map_pre_len, 3),
       conf_map_post_len: _.round(conf_map_post_len, 3),
+      intersection_len: _.round(intersection_len, 3),
     };
 
     return acc;

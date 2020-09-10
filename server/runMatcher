@@ -1,0 +1,108 @@
+#!/bin/bash
+
+BODY='
+{
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 0,
+        "shape_id": "1000084",
+        "shape_index": 0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.774154,
+            42.664811
+          ],
+          [
+            -73.774155,
+            42.66481
+          ]
+        ]
+      },
+      "id": 0
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 1,
+        "shape_id": "1000084",
+        "shape_index": 1
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.774155,
+            42.66481
+          ],
+          [
+            -73.774382,
+            42.664583
+          ],
+          [
+            -73.774739,
+            42.664209
+          ],
+          [
+            -73.775149,
+            42.66384
+          ]
+        ]
+      },
+      "id": 1
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 2,
+        "shape_id": "1000084",
+        "shape_index": 2
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.775149,
+            42.66384
+          ],
+          [
+            -73.77515,
+            42.663839
+          ],
+          [
+            -73.77515,
+            42.663839
+          ],
+          [
+            -73.77531,
+            42.663694
+          ],
+          [
+            -73.775337,
+            42.66367
+          ],
+          [
+            -73.775367,
+            42.663645
+          ],
+          [
+            -73.77587,
+            42.663193
+          ],
+          [
+            -73.776196,
+            42.662896
+          ]
+        ]
+      },
+      "id": 2
+    }
+  ]
+}
+'
+
+curl -d "$BODY" -H "Content-Type: application/json" -X POST http://localhost:8080/shst-match
