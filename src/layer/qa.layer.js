@@ -2,6 +2,7 @@ import React from "react"
 import { ShshStyle, ShstSource, GtfsEdgesStyle } from './shst_styles.js'
 import MapLayer from "AvlMap/MapLayer"
 import length from '@turf/length'
+import * as d3 from "d3-scale"
 
 // const COLOR = 'rgba(255, 255, 255, 0.95)'
 const api = 'http://lor.availabs.org:9010' 
@@ -15,13 +16,13 @@ class ShstLayer extends MapLayer {
         fetch(`${api}/gtfs-matches`)
         .then(r => r.json())
         .then(matches => {
-            console.log('matches', matches)
+            // console.log('matches', matches)
             this.matches = matches
             fetch(`${api}/gtfs-conflation-map-join`)
             .then(r => r.json())
             .then(joins => {
                 this.joins = joins;
-                console.log('joins', joins)
+                // console.log('joins', joins)
                   fetch(`${api}/gtfs-edges`)
                     .then(r => r.json())
                     .then(edges => {
@@ -30,11 +31,51 @@ class ShstLayer extends MapLayer {
                     })
             })
         })
+
+        fetch(`${api}/gtfs-conflation-schedule-join`)
+        .then(r => r.json())
+        .then(schedule => {
+            //console.log('got schedule', schedule)
+            this.schedule = schedule
+            this.calculateSchedule(schedule)
+        })
         
         this.toggleTransit = this.toggleTransit.bind(this)
         this.transitOpacity = this.transitOpacity.bind(this)
         this.highlightUnJoined = this.highlightUnJoined.bind(this)
         this.highlightUnMatched = this.highlightUnMatched.bind(this)
+    }
+
+    calculateSchedule (schedule) {
+        let aadts = Object.values(schedule).map(d => d.aadt)
+        let domain = [Math.min(...aadts), median(aadts), Math.max(...aadts)]
+        let aadtScale = d3.scaleLinear()
+            .domain(domain)
+            .range(['#edf8b1', '#7fcdbb','#2c7fb8'])
+
+
+
+
+
+        let segmentColors = Object.keys(schedule)
+            .reduce((out,mapId) => {
+                out[mapId] = aadtScale(schedule[mapId].aadt)
+                return out
+            },{})
+
+        console.log(domain, segmentColors)
+
+        this.map.setPaintProperty(
+            "shst",
+            'line-color',
+
+            ["case",
+                ["has", ["to-string", ["get", "id"]], ["literal", segmentColors]],
+                ["get", ["to-string", ["get", "id"]], ["literal", segmentColors]],
+            'white']
+        );
+
+
     }
 
     calculateStatistics (matches,edges, joins) {
@@ -86,7 +127,7 @@ class ShstLayer extends MapLayer {
                 let matchLength = joins[e.properties.matchId]
                     .reduce((out, curr) =>  { return out + (curr.conf_map_seg_len - (curr.conf_map_pre_len + curr.conf_map_post_len ))},0)
                 
-                this.join10 +=  Math.abs(e.properties.length - matchLength) < .01 ? 1 : 0
+                this.join10 +=  Math.abs(e.properties.length - matchLength) < .03 ? 1 : 0
                 this.join50 +=  Math.abs(e.properties.length - matchLength) < .5 ? 1 : 0
 
             }
@@ -239,7 +280,24 @@ class ShstLayer extends MapLayer {
     },
     popover: {
         layers: ["shst","gtfs-edges"],
-        dataFunc: (feature,map) => [['id', feature.id], ...Object.keys(feature.properties).map(k => [k, feature.properties[k]])]
+        dataFunc: function (feature,map) {
+            let transit = []
+            if(feature.properties.shst && this.schedule && this.schedule[feature.properties.id]){
+                console.log(this.schedule[feature.properties.id])
+                transit.push([
+                    <div style={{fontSize:'1.5em', fontWeight: 500}}>Bus AADT</div>,
+                    <div style={{fontSize:'1.5em', fontWeight: 500}}>{this.schedule[feature.properties.id].aadt}</div>
+                ])
+                Object.keys(this.schedule[feature.properties.id].aadt_by_route).forEach(route => {
+                    let count = Object.values(this.schedule[feature.properties.id].aadt_by_route[route]).reduce((a,b) => a+b)
+                    transit.push([
+                    <div style={{fontSize:'1.2em', fontWeight: 300}}>{route}</div>,
+                    <div style={{fontSize:'1.2em', fontWeight: 300}}>{count}</div>
+                ])
+                })
+            }
+            return [...transit,...Object.keys(feature.properties).map(k => [k, feature.properties[k]]),]
+        }
     },
     infoBoxes: {
         Overview: {
@@ -332,3 +390,17 @@ const MapController = ({layer}) => {
 }
 
 
+function median(values){
+  if(values.length ===0) return 0;
+
+  values.sort(function(a,b){
+    return a-b;
+  });
+
+  var half = Math.floor(values.length / 2);
+
+  if (values.length % 2)
+    return values[half];
+
+  return (values[half - 1] + values[half]) / 2.0;
+}
