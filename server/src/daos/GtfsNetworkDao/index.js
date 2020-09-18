@@ -2,14 +2,23 @@ const turf = require('@turf/turf');
 
 const db = require('../../services/DatabaseService');
 
-const getGtfsEdgesStmt = db.prepare(`
-  SELECT
-      feature
-    FROM gtfs_network.shape_segments;
-`);
+const getGtfsEdgesStmts = {};
 
-const getGtfsEdges = () => {
-  const features = getGtfsEdgesStmt
+const prepareGetGtfsEdgesStmts = (agency) => {
+  if (!getGtfsEdgesStmts[agency]) {
+    getGtfsEdgesStmts[agency] = db[agency].prepare(`
+      SELECT
+          feature
+        FROM gtfs_network.shape_segments;
+    `);
+  }
+
+  return getGtfsEdgesStmts[agency];
+};
+
+const getGtfsEdges = (agency) => {
+  const q = prepareGetGtfsEdgesStmts(agency);
+  const features = q
     .raw()
     .all()
     .map(([feature]) => {

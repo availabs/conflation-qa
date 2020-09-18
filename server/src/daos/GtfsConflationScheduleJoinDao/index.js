@@ -12,18 +12,26 @@
 
 const db = require('../../services/DatabaseService');
 
-const getGtfsConflationScheduleJoinStmt = db.prepare(`
-  SELECT
-      conflation_map_id,
-      aadt,
-      aadt_by_peak,
-      aadt_by_route
-    FROM gtfs_conflation_schedule_join.conflation_map_aadt_breakdown
-  ;
-`);
+const getGtfsConflationScheduleJoinStmts = {};
 
-const getGtfsConflationScheduleJoin = () => {
-  const result = getGtfsConflationScheduleJoinStmt.raw().all();
+const prepareGetGtfsConflationScheduleJoinStmt = (agency) => {
+  if (!getGtfsConflationScheduleJoinStmts[agency]) {
+    getGtfsConflationScheduleJoinStmts[agency] = db[agency].prepare(`
+      SELECT
+          conflation_map_id,
+          aadt,
+          aadt_by_peak,
+          aadt_by_route
+        FROM gtfs_conflation_schedule_join.conflation_map_aadt_breakdown
+      ;
+    `);
+  }
+  return getGtfsConflationScheduleJoinStmts[agency];
+};
+
+const getGtfsConflationScheduleJoin = (agency) => {
+  const q = prepareGetGtfsConflationScheduleJoinStmt(agency);
+  const result = q.raw().all();
 
   const d = result.reduce((acc, row) => {
     const [conflation_map_id, aadt, aadt_by_peak, aadt_by_route] = row;

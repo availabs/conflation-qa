@@ -3,6 +3,7 @@
 const restify = require('restify');
 const corsMiddleware = require('restify-cors-middleware');
 
+const { getAgencies } = require('./src/daos/AgenciesDao');
 const { getGtfsEdges } = require('./src/daos/GtfsNetworkDao');
 const {
   getGtfsMatches,
@@ -34,37 +35,48 @@ server.pre(cors.preflight);
 server.use(cors.actual);
 server.use(restify.plugins.bodyParser());
 
-server.get('/gtfs-edges', (_req, res, next) => {
-  const gtfsEdges = getGtfsEdges();
+server.get('/list-agencies', (_req, res, next) => {
+  const agencies = getAgencies();
+  res.send(agencies);
+  next();
+});
+
+server.get('/:agency/gtfs-edges', (req, res, next) => {
+  const { agency } = req.params;
+  const gtfsEdges = getGtfsEdges(agency);
   res.send(gtfsEdges);
   next();
 });
 
-server.get('/gtfs-matches', (_req, res, next) => {
-  const gtfsMatches = getGtfsMatches();
+server.get('/:agency/gtfs-matches', (req, res, next) => {
+  const { agency } = req.params;
+  const gtfsMatches = getGtfsMatches(agency);
   res.send(gtfsMatches);
   next();
 });
 
-server.get('/gtfs-conflation-map-join', (_req, res, next) => {
-  const result = getGtfsConflationMapJoin();
+server.get('/:agency/gtfs-conflation-map-join', (req, res, next) => {
+  const { agency } = req.params;
+  const result = getGtfsConflationMapJoin(agency);
   res.send(result);
   next();
 });
 
-server.get('/gtfs-conflation-schedule-join', (_req, res, next) => {
-  const result = getGtfsConflationScheduleJoin();
+server.get('/:agency/gtfs-conflation-schedule-join', (req, res, next) => {
+  const { agency } = req.params;
+  const result = getGtfsConflationScheduleJoin(agency);
   res.send(result);
   next();
 });
 
-server.get('/shst-match-params-descriptions', (_req, res, next) => {
-  const params = getSharedStreetsMatchParameters();
+server.get('/:agency/shst-match-params-descriptions', (req, res, next) => {
+  const { agency } = req.params;
+  const params = getSharedStreetsMatchParameters(agency);
   res.send(params);
   next();
 });
 
-server.post('/shst-match', async (req, res, next) => {
+server.post('/:agency/shst-match', async (req, res, next) => {
   try {
     console.log(JSON.stringify(req.body, null, 4));
 
@@ -79,8 +91,9 @@ server.post('/shst-match', async (req, res, next) => {
   }
 });
 
-server.get('/shst-match-scores', (_req, res, next) => {
-  const scores = getSharedStreetsMatchesScores();
+server.get('/:agency/shst-match-scores', (req, res, next) => {
+  const { agency } = req.params;
+  const scores = getSharedStreetsMatchesScores(agency);
   res.send(scores);
   next();
 });

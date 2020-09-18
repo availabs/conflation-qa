@@ -17,22 +17,31 @@ const _ = require('lodash');
 
 const db = require('../../services/DatabaseService');
 
-const getGtfsConflationMapJoinStmt = db.prepare(`
-  SELECT
-      gtfs_shape_id,
-      gtfs_shape_index,
-      conflation_map_id,
-      conf_map_seg_len,
-      conf_map_pre_len,
-      conf_map_post_len,
-      along_idx,
-      intersection_len
-    FROM gtfs_conflation_map_join.gtfs_matches_conflation_map_join
-  ;
-`);
+const getGtfsConflationMapJoinStmts = {};
 
-const getGtfsConflationMapJoin = () => {
-  const result = getGtfsConflationMapJoinStmt.raw().all();
+const prepareGetGtfsConflationMapJoinStmt = (agency) => {
+  if (!getGtfsConflationMapJoinStmts[agency]) {
+    getGtfsConflationMapJoinStmts[agency] = db[agency].prepare(`
+        SELECT
+            gtfs_shape_id,
+            gtfs_shape_index,
+            conflation_map_id,
+            conf_map_seg_len,
+            conf_map_pre_len,
+            conf_map_post_len,
+            along_idx,
+            intersection_len
+          FROM gtfs_conflation_map_join.gtfs_matches_conflation_map_join
+        ;
+      `);
+  }
+
+  return getGtfsConflationMapJoinStmts[agency];
+};
+
+const getGtfsConflationMapJoin = (agency) => {
+  const q = prepareGetGtfsConflationMapJoinStmt(agency);
+  const result = q.raw().all();
 
   const matches = result.reduce((acc, row) => {
     const [
